@@ -53,6 +53,11 @@ namespace s2industries.ZUGFeRD
                 { "xs", "http://www.w3.org/2001/XMLSchema" }
             };
 
+            if (descriptor.Profile == Profile.HRInvoice)
+            {
+                namespaces.Add("hrextac", "urn:hzn.hr:schema:xsd:HRExtensionAggregateComponents-1");
+            }
+
             if (isInvoice)
             {
                 namespaces.Add("ubl", "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2");
@@ -84,6 +89,11 @@ namespace s2industries.ZUGFeRD
             _Writer.WriteAttributeString("xmlns", "cbc", "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2");
             _Writer.WriteAttributeString("xmlns", "ext", "urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2");
             _Writer.WriteAttributeString("xmlns", "xs", "http://www.w3.org/2001/XMLSchema");
+
+            if (descriptor.Profile == Profile.HRInvoice)
+            {
+                _Writer.WriteAttributeString("xmlns", "hrextac", "urn:hzn.hr:schema:xsd:HRExtensionAggregateComponents-1");
+            }
 
             if (isInvoice && descriptor.Profile == Profile.HRInvoice)
             {
@@ -1110,7 +1120,7 @@ namespace s2industries.ZUGFeRD
                 if ((party.SpecifiedLegalOrganization != null) || !String.IsNullOrWhiteSpace(party.Description))
                 {
                     writer.WriteStartElement("cac", "PartyLegalEntity");
-                    writer.WriteOptionalElementString("cbc", "RegistrationName", party.SpecifiedLegalOrganization.TradingBusinessName);
+                    writer.WriteOptionalElementString("cbc", "RegistrationName", party.SpecifiedLegalOrganization?.TradingBusinessName);
 
                     if (party.SpecifiedLegalOrganization?.ID != null && !String.IsNullOrWhiteSpace(party.SpecifiedLegalOrganization.ID.ID))
                     {
@@ -1150,9 +1160,26 @@ namespace s2industries.ZUGFeRD
                 if (writeSellerContact)
                 {
                     writer.WriteStartElement("cac", "SellerContact");
-                    writer.WriteOptionalElementString("cbc", "ID", contact.OrgUnit);
-                    writer.WriteOptionalElementString("cbc", "Name", contact.Name);
+                    writer.WriteOptionalElementString("cbc", "ID", contact?.OrgUnit);
+                    writer.WriteOptionalElementString("cbc", "Name", contact?.Name);
                     writer.WriteEndElement();
+                }
+
+                // HR-BT-4 (operator tag) and HR-BT-5 (operator OIB) - required by the Croatian CIUS
+                if (partyType == PartyTypes.SellerTradeParty && isHrInvoice)
+                {
+                    if (!string.IsNullOrWhiteSpace(this._Descriptor.HROperatorTag))
+                    {
+                        writer.WriteStartElement("hrextac", "OperatorTag");
+                        writer.WriteValue(this._Descriptor.HROperatorTag);
+                        writer.WriteEndElement();
+                    }
+                    if (!string.IsNullOrWhiteSpace(this._Descriptor.HROperatorOIB))
+                    {
+                        writer.WriteStartElement("hrextac", "OperatorOIB");
+                        writer.WriteValue(this._Descriptor.HROperatorOIB);
+                        writer.WriteEndElement();
+                    }
                 }
 
                 _Writer.WriteEndElement(); //OptionalParty

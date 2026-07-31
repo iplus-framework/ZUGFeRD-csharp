@@ -304,6 +304,20 @@ namespace s2industries.ZUGFeRD
         public BusinessProcessType BusinessProcessType { get; set; } = BusinessProcessType.OrderBasedOnContract;
 
         /// <summary>
+        /// HR-BT-4: Operator tag (Oznaka operatera).
+        /// Identifies the person who created the document (the operator).
+        /// Required by the Croatian CIUS (urn:mfin.gov.hr:cius-2025:1.0) inside AccountingSupplierParty.
+        /// </summary>
+        public string HROperatorTag { get; set; }
+
+        /// <summary>
+        /// HR-BT-5: Operator OIB (OIB operatera).
+        /// The Croatian personal identification number (OIB) of the operator who created the document.
+        /// Required by the Croatian CIUS (urn:mfin.gov.hr:cius-2025:1.0) inside AccountingSupplierParty.
+        /// </summary>
+        public string HROperatorOIB { get; set; }
+
+        /// <summary>
         /// Document name (free text)
         /// </summary>
         public string Name { get; set; }
