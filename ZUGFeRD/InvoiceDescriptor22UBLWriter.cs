@@ -43,7 +43,7 @@ namespace s2industries.ZUGFeRD
 
             this._Descriptor = descriptor;
             this._Writer = new ProfileAwareXmlTextWriter(stream, descriptor.Profile, options?.AutomaticallyCleanInvalidCharacters ?? false);
-            bool isInvoice = this._Descriptor.Profile == Profile.HRInvoice || _IsInvoiceAccordingToUBLSpecification(this._Descriptor.Type);
+            bool isInvoice = _IsInvoiceAccordingToUBLSpecification(this._Descriptor.Type);
 
             Dictionary<string, string> namespaces = new Dictionary<string, string>()
             {
@@ -1163,23 +1163,6 @@ namespace s2industries.ZUGFeRD
                     writer.WriteOptionalElementString("cbc", "ID", contact?.OrgUnit);
                     writer.WriteOptionalElementString("cbc", "Name", contact?.Name);
                     writer.WriteEndElement();
-                }
-
-                // HR-BT-4 (operator tag) and HR-BT-5 (operator OIB) - required by the Croatian CIUS
-                if (partyType == PartyTypes.SellerTradeParty && isHrInvoice)
-                {
-                    if (!string.IsNullOrWhiteSpace(this._Descriptor.HROperatorTag))
-                    {
-                        writer.WriteStartElement("hrextac", "OperatorTag");
-                        writer.WriteValue(this._Descriptor.HROperatorTag);
-                        writer.WriteEndElement();
-                    }
-                    if (!string.IsNullOrWhiteSpace(this._Descriptor.HROperatorOIB))
-                    {
-                        writer.WriteStartElement("hrextac", "OperatorOIB");
-                        writer.WriteValue(this._Descriptor.HROperatorOIB);
-                        writer.WriteEndElement();
-                    }
                 }
 
                 _Writer.WriteEndElement(); //OptionalParty

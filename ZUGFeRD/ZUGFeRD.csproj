@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net480;net8.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net461;net480;net8.0;net10.0</TargetFrameworks>
     <Version>18.0.0-beta3</Version>
     <Authors>iPlus tim (original by Stephan Stapel)</Authors>
     <Company>gipSoft</Company>
@@ -88,13 +88,15 @@ Thanks to all contributors!
     <PackageId>iPlus.ZUGFeRD</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/stephanstapel/ZUGFeRD-csharp/</RepositoryUrl>
-    <UserSecretsId>ceeaa3c6-7c48-4061-b8f6-da26a9de5879</UserSecretsId>
-    <RepositoryType>git</RepositoryType>
-    <IncludeSymbols>True</IncludeSymbols>
+	<UserSecretsId>ceeaa3c6-7c48-4061-b8f6-da26a9de5879</UserSecretsId>
+	<RepositoryType>git</RepositoryType>
+	<IncludeSymbols>True</IncludeSymbols>
 	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<EmbedUntrackedSources>true</EmbedUntrackedSources>
-	<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	<!-- Only enable Source Link / CI build for actual CI builds (e.g. when packing the NuGet).
+	     For local debugging we want the PDB to embed local source paths instead of GitHub URLs. -->
+	<ContinuousIntegrationBuild Condition="'$(ContinuousIntegrationBuild)' == '' AND '$(BuildingInsideVisualStudio)' != 'true' AND '$(UseLocalDebugBuild)' != 'true'">true</ContinuousIntegrationBuild>
 	<RootNamespace>s2industries.ZUGFeRD</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -109,7 +111,7 @@ Thanks to all contributors!
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(UseLocalDebugBuild)' != 'true'">
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
 </Project>
